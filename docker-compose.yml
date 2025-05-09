@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
+    container_name: bnpl-service
     ports:
       - "8080:8080"
     depends_on:
@@ -12,9 +13,27 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - JWT_SECRET=asecuresecretkeywithlength32charactr
+      - JWT_EXPIRATION=86400
+    # Using the entrypoint script in the Dockerfile
+    # No need for command override here
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v3/api-docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
 
   db:
     image: postgres:14
+    container_name: bnpl-db
     ports:
       - "5432:5432"
     environment:
@@ -30,7 +49,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Add init scripts volume to add our stored procedures
-      - ./sql/init:/docker-entrypoint-initdb.d
+      - ./src/main/resources/sql/init:/docker-entrypoint-initdb.d
     deploy:
       resources:
         limits:
