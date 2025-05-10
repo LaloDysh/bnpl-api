@@ -1,8 +1,6 @@
 package com.bnpl.infrastructure.adapter.in.web.customer.response;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,7 +9,7 @@ public class CustomerResponse {
 
     private UUID id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     private BigDecimal creditLineAmount;

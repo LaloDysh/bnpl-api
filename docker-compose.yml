@@ -15,21 +15,14 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - JWT_SECRET=asecuresecretkeywithlength32charactr
       - JWT_EXPIRATION=86400
-    # Using the entrypoint script in the Dockerfile
-    # No need for command override here
+      - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
+      - TZ=UTC
+      - JAVA_OPTS=-Duser.timezone=UTC
     volumes:
       - ./logs:/app/logs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/v3/api-docs"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    networks:
+      - bnpl-network
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
 
   db:
     image: postgres:14
@@ -46,21 +39,17 @@ services:
       - POSTGRES_WORK_MEM=8MB
       - POSTGRES_MAINTENANCE_WORK_MEM=64MB
       - POSTGRES_MAX_CONNECTIONS=100
+      - TZ=UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Add init scripts volume to add our stored procedures
       - ./src/main/resources/sql/init:/docker-entrypoint-initdb.d
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    networks:
+      - bnpl-network
     restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  bnpl-network:
+    driver: bridge

@@ -8,10 +8,12 @@ server:
     include-binding-errors: always
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: bnpl-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bnpl}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/bnpl}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -34,9 +36,16 @@ spring:
     show-sql: false
     open-in-view: false
   jackson:
-    default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+    deserialization:
+      adjust-dates-to-context-time-zone: false
+    time-zone: UTC
+    serialization-inclusion: non_null
+    mapper:
+      propagate-transient-marker: true
   mvc:
     throw-exception-if-no-handler-found: true
   web:
@@ -56,7 +65,7 @@ springdoc:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:mysupersecretkeywithminimumlengthof32chars}
+  secret: ${JWT_SECRET:mysupersecretkeywithlength32chars}
   expiration: ${JWT_EXPIRATION:3600}
 
 # Logging Configuration
@@ -73,21 +82,3 @@ logging:
     name: logs/bnpl-service.log
     max-size: 10MB
     max-history: 7
-
-# test-specific configuration in application-test.yml
-# application-test.yml
-spring:
-  datasource:
-    url: jdbc:tc:postgresql:14:///bnpl_test
-    username: test
-    password: test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        format_sql: true
-        jdbc:
-          time_zone: UTC
-    show-sql: true

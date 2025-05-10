@@ -10,7 +10,7 @@ public class InstallmentResponse {
 
     private BigDecimal amount;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate scheduledPaymentDate;
 
     private InstallmentStatus status;
