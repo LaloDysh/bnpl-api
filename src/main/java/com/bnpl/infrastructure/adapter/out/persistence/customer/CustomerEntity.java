@@ -1,4 +1,4 @@
-package com.bnpl.infrastructure.adapter.out.persistance.customer;
+package com.bnpl.infrastructure.adapter.out.persistence.customer;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

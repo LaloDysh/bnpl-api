@@ -1,4 +1,4 @@
-package com.bnpl.infrastructure.adapter.out.persistance.loan;
+package com.bnpl.infrastructure.adapter.out.persistence.loan;
 
 import com.bnpl.application.port.out.loan.LoanRepository;
 import com.bnpl.domain.model.loan.Loan;

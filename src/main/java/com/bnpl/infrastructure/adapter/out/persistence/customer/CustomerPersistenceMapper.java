@@ -1,4 +1,4 @@
-package com.bnpl.infrastructure.adapter.out.persistance.customer;
+package com.bnpl.infrastructure.adapter.out.persistence.customer;
 
 
 import com.bnpl.domain.model.customer.CreditLine;
