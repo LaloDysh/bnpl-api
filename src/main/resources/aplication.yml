@@ -1,6 +1,6 @@
 # application.yml
 server:
-  port: 8080
+  port: ${SERVER_PORT}
   servlet:
     context-path: /
   error:
@@ -8,14 +8,12 @@ server:
     include-binding-errors: always
 
 spring:
-  main:
-    allow-bean-definition-overriding: true
   application:
     name: bnpl-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/bnpl}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5
@@ -27,7 +25,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
     properties:
       hibernate:
         format_sql: true
@@ -65,8 +63,8 @@ springdoc:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:mysupersecretkeywithlength32chars}
-  expiration: ${JWT_EXPIRATION:3600}
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 # Logging Configuration
 logging:

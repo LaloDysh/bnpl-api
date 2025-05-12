@@ -1,4 +1,3 @@
-# Dockerfile
 FROM maven:3.9-amazoncorretto-17 AS build
 WORKDIR /app
 COPY pom.xml .
@@ -11,7 +10,7 @@ RUN mvn package -DskipTests
 # Create a smaller runtime image
 FROM amazoncorretto:17-alpine
 WORKDIR /app
-# Install timezone data and set timezone to UTC
+# Install required utilities
 RUN apk add --no-cache tzdata && \
     cp /usr/share/zoneinfo/UTC /etc/localtime && \
     echo "UTC" > /etc/timezone
@@ -19,17 +18,18 @@ RUN apk add --no-cache tzdata && \
 COPY --from=build /app/target/*.jar app.jar
 # Create directory for logs
 RUN mkdir -p /app/logs
-# Install necessary tools
+# Add entrypoint script
 RUN apk add --no-cache netcat-openbsd curl
-
 # Copy wait-for-it script
 COPY wait-for-it.sh /
 RUN chmod +x /wait-for-it.sh
 
-# Set environment variables
+# Set environment variables with defaults that can be overridden
+ENV SERVER_PORT=8080
 ENV SPRING_PROFILES_ACTIVE=prod
 ENV TZ=UTC
 ENV JAVA_OPTS="-Duser.timezone=UTC"
 
-EXPOSE 8080
+# Expose the configured port
+EXPOSE ${SERVER_PORT}
 ENTRYPOINT ["/bin/sh", "-c", "/wait-for-it.sh db:5432 -t 60 -- java -Dspring.main.allow-bean-definition-overriding=true -Duser.timezone=UTC ${JAVA_OPTS} -jar app.jar"]
