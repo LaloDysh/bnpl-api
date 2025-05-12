@@ -23,13 +23,11 @@ public class PaymentSchemeAssigner {
         }
 
         // Rule 2: If the customer ID is greater than 25
-        // Since UUIDs don't have a natural ordering, we'll use the first integer from the UUID
         int idValue = Math.abs(customer.getId().hashCode() % 100);
         if (idValue > SCHEME_2_ID_THRESHOLD) {
             return PaymentScheme.SCHEME_2;
         }
-
-        // Default: Scheme 2
+        
         return PaymentScheme.SCHEME_2;
     }
 }
