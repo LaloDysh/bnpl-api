@@ -16,10 +16,6 @@ public class CreditLineCalculator {
     public BigDecimal calculateCreditLine(LocalDate dateOfBirth, LocalDate currentDate) {
         int age = Period.between(dateOfBirth, currentDate).getYears();
 
-        if (age < 18 || age > 65) {
-            throw new IllegalArgumentException("Age must be between 18 and 65 years");
-        }
-
         if (age >= 18 && age <= 25) {
             return YOUNG_CREDIT_LINE;
         } else if (age >= 26 && age <= 30) {

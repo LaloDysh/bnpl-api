@@ -16,13 +16,8 @@ public class JacksonConfig {
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         ObjectMapper objectMapper = builder.createXmlMapper(false).build();
         
-        // Registrar módulo para tipos Java 8 DateTime
         objectMapper.registerModule(new JavaTimeModule());
-        
-        // Deshabilitar serialización de fechas como timestamps
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        
-        // Habilitar serialización de ZonedDateTime como strings ISO-8601
         objectMapper.disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS);
         
         return objectMapper;

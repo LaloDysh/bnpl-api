@@ -76,7 +76,6 @@ public class CreateLoanService implements CreateLoanUseCase {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // Deduct loan amount from customer's credit line
         customer.getCreditLine().deduct(amount);
         customerRepository.updateCreditLine(customerId, customer);
 

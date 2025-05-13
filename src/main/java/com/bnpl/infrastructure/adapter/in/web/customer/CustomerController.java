@@ -53,7 +53,6 @@ public class CustomerController {
         
         CustomerResponse response = customerMapper.toResponse(customer);
         
-        // Generate JWT token for the customer
         String token = jwtService.generateToken(customer.getId());
         
         URI location = ServletUriComponentsBuilder

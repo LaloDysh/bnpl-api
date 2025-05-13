@@ -3,7 +3,6 @@ package com.bnpl.application.usecase.customer;
 import com.bnpl.application.port.in.customer.CreateCustomerUseCase;
 import com.bnpl.application.port.out.customer.CustomerRepository;
 import com.bnpl.application.service.customer.CreditLineCalculator;
-// import com.bnpl.application.service.customer.CreditLineCalculator;
 import com.bnpl.domain.model.customer.CreditLine;
 import com.bnpl.domain.model.customer.Customer;
 import com.bnpl.domain.model.error.BnplException;

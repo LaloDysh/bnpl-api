@@ -1,7 +1,6 @@
 package com.bnpl.infrastructure.adapter.in.web.customer;
 
 import com.bnpl.domain.model.customer.Customer;
-// import com.bnpl.infrastructure.adapter.in.web.customer.request.CustomerRequest;
 import com.bnpl.infrastructure.adapter.in.web.customer.response.CustomerResponse;
 import org.springframework.stereotype.Component;
 

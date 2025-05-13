@@ -1,7 +1,6 @@
 package com.bnpl.infrastructure.adapter.in.security;
 
 import com.bnpl.application.service.security.JwtService;
-// import com.bnpl.domain.model.error.BnplException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
         
-        // Skip authentication for customer creation endpoint
         if (request.getRequestURI().equals("/v1/customers") && request.getMethod().equals("POST")) {
             filterChain.doFilter(request, response);
             return;

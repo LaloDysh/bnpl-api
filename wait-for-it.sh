@@ -1,18 +1,21 @@
-#!/bin/sh
-# wait-for-it.sh: Script mejorado para esperar a que un servicio esté disponible
-
 TIMEOUT=60
 QUIET=0
 HOST=""
 PORT=""
 VERBOSE=0
 
+POSTGRES_USER=${POSTGRES_USER}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+POSTGRES_DB=${POSTGRES_DB}
+
 timestamp() {
   date +"%Y-%m-%d %H:%M:%S"
 }
 
 log() {
-  echo "$(timestamp) $*"
+  if [ "$QUIET" -eq 0 ]; then
+    echo "$(timestamp) $*"
+  fi
 }
 
 command_exists() {
@@ -22,19 +25,19 @@ command_exists() {
 check_connection() {
   if command_exists nc; then
     if [ "$VERBOSE" -eq 1 ]; then
-      log "Intentando conexión con nc -z $HOST $PORT"
+      log "Trying connection with nc -z $HOST $PORT"
     fi
     nc -z "$HOST" "$PORT" > /dev/null 2>&1
     return $?
   elif command_exists telnet; then
     if [ "$VERBOSE" -eq 1 ]; then
-      log "Intentando conexión con telnet $HOST $PORT"
+      log "Trying connection with telnet $HOST $PORT"
     fi
     echo quit | telnet "$HOST" "$PORT" > /dev/null 2>&1
     return $?
   else
     if [ "$VERBOSE" -eq 1 ]; then
-      log "Intentando conexión con /dev/tcp/$HOST/$PORT"
+      log "Trying connection with /dev/tcp/$HOST/$PORT"
     fi
     (echo > "/dev/tcp/$HOST/$PORT") >/dev/null 2>&1
     return $?
@@ -42,66 +45,59 @@ check_connection() {
 }
 
 wait_for() {
-  log "Esperando a que PostgreSQL esté listo en $HOST:$PORT..."
-  
+  log "Waiting for PostgreSQL to be ready at $HOST:$PORT..."
   count=1
   start_ts=$(date +%s)
   
   while true; do
     if check_connection; then
       end_ts=$(date +%s)
-      diff=$(( end_ts - start_ts ))
-      log "¡PostgreSQL está disponible en $HOST:$PORT después de $diff segundos!"
-      
-      # Espera adicional de 2 segundos para asegurar que PostgreSQL esté completamente listo
+      diff=$((end_ts - start_ts))
+      log "PostgreSQL is available at $HOST:$PORT after $diff seconds!"
       sleep 2
       
-      # Prueba si PostgreSQL realmente está listo para aceptar conexiones
       if command_exists psql; then
-        log "Probando conexión a PostgreSQL con psql..."
-        if PGPASSWORD=$POSTGRES_PASSWORD psql -h $HOST -U $POSTGRES_USER -d $POSTGRES_DB -c "SELECT 1" > /dev/null 2>&1; then
-          log "Conexión a PostgreSQL establecida correctamente"
+        log "Testing PostgreSQL connection with psql..."
+        if PGPASSWORD=$POSTGRES_PASSWORD psql -h "$HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1" > /dev/null 2>&1; then
+          log "PostgreSQL connection established successfully"
         else
-          log "¡Alerta! Todavía no se puede conectar con psql, pero el puerto está abierto"
+          log "Warning! Can't connect with psql yet, but port is open"
         fi
       fi
       
       if [ $# -gt 0 ]; then
-        log "Ejecutando comando: $*"
+        log "Executing command: $*"
         exec "$@"
       fi
       return 0
     fi
     
     end_ts=$(date +%s)
-    diff=$(( end_ts - start_ts ))
+    diff=$((end_ts - start_ts))
     
     if [ $diff -gt $TIMEOUT ]; then
-      log "Timeout después de esperar $TIMEOUT segundos por $HOST:$PORT"
-      # Información adicional para diagnóstico
-      log "Información de diagnóstico:"
+      log "Timeout after waiting $TIMEOUT seconds for $HOST:$PORT"
+      log "Diagnostic information:"
+      
       if command_exists ping; then
-        log "Intentando ping a $HOST..."
-        ping -c 1 $HOST
+        log "Trying to ping $HOST..."
+        ping -c 1 "$HOST"
       fi
-      log "Estado de la red Docker:"
+      
+      log "Docker network status:"
       if command_exists docker; then
         docker network ls
         docker ps
       fi
+      
       return 1
     fi
     
-    log "Esperando a PostgreSQL... ($count/$TIMEOUT)"
+    log "Waiting for PostgreSQL... ($count/$TIMEOUT)"
     count=$((count+1))
     sleep 1
   done
 }
-
-# Procesar argumentos
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="postgres"
-POSTGRES_DB="bnpl"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -145,16 +141,13 @@ while [ $# -gt 0 ]; do
 done
 
 if [ "$HOST" = "" -o "$PORT" = "" ]; then
-  log "Error: debes proporcionar un host y puerto para probar (host:puerto)"
+  log "Error: you must provide a host and port to test (host:port)"
   exit 1
 fi
 
-export POSTGRES_USER
-export POSTGRES_PASSWORD
-export POSTGRES_DB
-
-# Mostrar información de red para diagnóstico
-log "Información de red del contenedor:"
-ip addr show
+if [ "$VERBOSE" -eq 1 ]; then
+  log "Container network information:"
+  ip addr show 2>/dev/null || true
+fi
 
 wait_for "$@"
